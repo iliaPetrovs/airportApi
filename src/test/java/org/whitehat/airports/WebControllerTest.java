@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.Base64Utils;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,13 +66,14 @@ public class WebControllerTest {
                 .andExpect(content().string(String.format("Succesfully added airport %s", newAirport)));
     }
 
-    public void itShouldDeleteAllAirport() throws Exception {
-        mockMvc.perform(get("/airports/"))
+    // DELETE all
+    @Test
+    public void itShouldDeleteAllAirports() throws Exception {
+        mockMvc.perform(delete("/airports/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("[\"LHR\",\"NRT\",\"LAX\"]"));
+                .andExpect(content().string("Removed all airports"));
     }
 
-    // DELETE all
 
 //    private static void printJSON(Object object) {
 //        String result;
