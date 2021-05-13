@@ -3,9 +3,11 @@ package org.whitehat.airports;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import org.springframework.http.HttpStatus;
@@ -24,28 +26,33 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/airports")
 public class WebController {
     public List<String> airports = new ArrayList<>();
-    public Map<String, String> users = Map.of("test user", "password");
+    public static Map<String, String> users;
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public WebController() {
         airports.add("LHR");
         airports.add("NRT");
         airports.add("LAX");
 
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        users = new HashMap<>();
+
         String hashedPassword = passwordEncoder.encode("cabbage");
 
         System.out.println(hashedPassword);
 
-        boolean isMatch = passwordEncoder.matches(hashedPassword, "$2a$10$MFDKo5y8czJsu4Gapjnk6uwCwKt1yblvtyu2rjMAE2QKh/H/UVAu6");
-        boolean isMatchTwo = passwordEncoder.matches("won't match", "$2a$10$MFDKo5y8czJsu4Gapjnk6uwCwKt1yblvtyu2rjMAE2QKh/H/UVAu6");
+        boolean isMatch = passwordEncoder.matches(hashedPassword, "$2a$10$O0Mrb2tKtz.qNevzZTEQBeIWUfcCNN0ozK4zQox5OFb1o9k6dYTaq");
+        boolean isMatchTwo = passwordEncoder.matches("won't match", "$2a$10$O0Mrb2tKtz.qNevzZTEQBeIWUfcCNN0ozK4zQox5OFb1o9k6dYTaq");
         System.out.println(String.format("This should be true: %s. This should be false: %s", isMatch, isMatchTwo));
 
     }
 
-    @PostMapping("/test")
-    public String makeUser(@RequestBody String user) throws IOException {
-        System.out.println(user);
-        return user;
+    @PostMapping("/users")
+    public String makeUser(@RequestBody Map<String,String> keyValuePairs) {
+        String user = keyValuePairs.get("name");
+        String pass = keyValuePairs.get("password");
+        users.put(user, passwordEncoder.encode(pass));
+        System.out.println(users.get(user));
+        return users.get(user);
     }
 
 
