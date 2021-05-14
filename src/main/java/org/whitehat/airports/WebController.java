@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.With;
+import org.jasypt.util.password.StrongPasswordEncryptor;
+import org.jasypt.util.text.AES256TextEncryptor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -28,6 +31,7 @@ public class WebController {
     public List<String> airports = new ArrayList<>();
     public static Map<String, String> users;
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    AES256TextEncryptor textEncryptor = new AES256TextEncryptor();
 
     public WebController() {
         airports.add("LHR");
@@ -36,15 +40,31 @@ public class WebController {
 
         users = new HashMap<>();
 
-        String hashedPassword = passwordEncoder.encode("cabbage");
+        textEncryptor.setPassword("coolpass");
 
-        System.out.println(hashedPassword);
+        String text = "Text to encrypt";
+        System.out.println("Before encryption: " + text);
 
-        boolean isMatch = passwordEncoder.matches(hashedPassword, "$2a$10$O0Mrb2tKtz.qNevzZTEQBeIWUfcCNN0ozK4zQox5OFb1o9k6dYTaq");
-        boolean isMatchTwo = passwordEncoder.matches("won't match", "$2a$10$O0Mrb2tKtz.qNevzZTEQBeIWUfcCNN0ozK4zQox5OFb1o9k6dYTaq");
-        System.out.println(String.format("This should be true: %s. This should be false: %s", isMatch, isMatchTwo));
+        String myEncryptedText = textEncryptor.encrypt(text);
+        System.out.println("Encrypted text: " + myEncryptedText);
+
+        String plainText = textEncryptor.decrypt(myEncryptedText);
+        System.out.println("Decrypted text: " + plainText);
+
+//        String hashedPassword = passwordEncoder.encode("test");
+//
+//        System.out.println(hashedPassword);
+//
+//        boolean isMatch = passwordEncoder.matches(hashedPassword, "$2a$10$O0Mrb2tKtz.qNevzZTEQBeIWUfcCNN0ozK4zQox5OFb1o9k6dYTaq");
+//        boolean isMatchTwo = passwordEncoder.matches("won't match", "$2a$10$O0Mrb2tKtz.qNevzZTEQBeIWUfcCNN0ozK4zQox5OFb1o9k6dYTaq");
+//        System.out.println(String.format("This should be true: %s. This should be false: %s", isMatch, isMatchTwo));
 
     }
+
+//    @PostMapping("login")
+//    public String login(@RequestBody Map<String, String> keyValuePairs) {
+//
+//    }
 
     @PostMapping("/users")
     public String makeUser(@RequestBody Map<String,String> keyValuePairs) {
